@@ -16,7 +16,7 @@ data class WeatherData(
     val timezone: Int? = null,
     val visibility: Int? = null,
     val weather: List<Weather?>? = null,
-    val wind: Wind? = null,
+    val wind: Wind? = null
 )
 
 @Serializable

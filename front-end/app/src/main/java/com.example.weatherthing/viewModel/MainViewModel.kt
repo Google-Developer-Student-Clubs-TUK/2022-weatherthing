@@ -10,10 +10,10 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
     private val _weather = MutableStateFlow<WeatherState>(WeatherState.Loading)
-    val weather : StateFlow<WeatherState> = _weather
+    val weather: StateFlow<WeatherState> = _weather
 
-    fun getCurrentWeather(latitude:Double, longitude:Double){
-        viewModelScope.launch{
+    fun getCurrentWeather(latitude: Double, longitude: Double) {
+        viewModelScope.launch {
             _weather.value = WeatherState.Loading
 
             _weather.value = kotlin.runCatching {
@@ -29,6 +29,6 @@ class MainViewModel : ViewModel() {
 
 sealed class WeatherState {
     object Loading : WeatherState()
-    class Loaded (val data: WeatherData) : WeatherState()
+    class Loaded(val data: WeatherData) : WeatherState()
     class Error(val message: String) : WeatherState()
 }

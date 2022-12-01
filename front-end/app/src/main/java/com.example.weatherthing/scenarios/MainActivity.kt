@@ -98,10 +98,11 @@ class MainActivity : ComponentActivity(), LocationListener {
             LocationRequest.PRIORITY_HIGH_ACCURACY,
             object : CancellationToken() {
                 override fun onCanceledRequested(p0: OnTokenCanceledListener) =
-                    CancellationTokenSource()!!.token
+                    CancellationTokenSource().token
 
                 override fun isCancellationRequested() = false
-            }).addOnSuccessListener { location: Location? ->
+            }
+        ).addOnSuccessListener { location: Location? ->
             if (location == null) Toast.makeText(this, "위치를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
             else {
                 location.let {
@@ -158,16 +159,16 @@ class MainActivity : ComponentActivity(), LocationListener {
                                 CancellationTokenSource().token
 
                             override fun isCancellationRequested() = false
-                        })
+                        }
+                    )
                         .addOnSuccessListener { location: Location? ->
-                            if (location == null)
+                            if (location == null) {
                                 Toast.makeText(this, "위치를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
-                            else {
+                            } else {
                                 location.let {
                                     viewModel.getCurrentWeather(it.latitude, it.longitude)
                                 }
                             }
-
                         }
                 }
             }

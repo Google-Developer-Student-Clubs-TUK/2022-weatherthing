@@ -1,6 +1,6 @@
 package com.example.weatherthing.scenarios
 
-import androidx.compose.foundation.Image
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -8,34 +8,21 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.draw.paint
-import androidx.compose.ui.graphics.BlendMode
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.weatherthing.R
-import com.example.weatherthing.ui.theme.sky
-import com.example.weatherthing.ui.theme.skyblue
-import com.example.weatherthing.utils.getWeatherImage
+import com.airbnb.lottie.compose.*
+import com.example.weatherthing.utils.getWeatherAnimationUrl
 import com.example.weatherthing.viewModel.MainViewModel
 import com.example.weatherthing.viewModel.WeatherState
 
 @Composable
 fun Home(viewModel: MainViewModel, navController: NavHostController) {
-    Scaffold(
-    ) {
+    Scaffold() {
         Column(
             Modifier
                 .fillMaxSize()
@@ -55,126 +42,49 @@ fun Home(viewModel: MainViewModel, navController: NavHostController) {
                     ShowWeather(state)
                 }
             }
-
         }
-
     }
 }
 
 @Composable
 private fun ShowWeather(state: WeatherState.Loaded) {
-    val name = state.data.name ?: "-"
-    val description = state.data.weather!![0]!!.description!!.substring(0, 1)
-        .uppercase() + state.data.weather[0]!!.description!!.substring(
-        1
-    ).lowercase()
-    val temp = "${((state.data.main!!.temp!! - 273.15)).toInt()}°"
-    val feelTemp = "체감 기온 ${((state.data.main.feels_like!! - 273.15)).toInt()}°"
-    val locIcon = Icons.Default.LocationOn
-    val humidipy = "습도 ${((state.data.main.humidity))}%"
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .paint(
-                painterResource(id = R.drawable.sky),
-                contentScale = ContentScale.FillHeight
-            )
-    ) {
-        Text(
-            text = "오늘의 날씨",
-            fontSize = 25.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(top = 70.dp)
+    val weatherData = state.data
+    val temp by remember {
+        mutableStateOf(
+            weatherData.main?.temp?.let {
+                "${ (it - 273.15 ).toInt()}°C"
+            } ?: "-°C"
         )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 20.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            Icon(
-                imageVector = locIcon, contentDescription = "위치", tint = Color.White,
-                modifier = Modifier.size(28.dp)
-            )
-            Text(
-                text = name,
-                fontSize = 25.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
-            )
-
-        }
-        Spacer(modifier = Modifier.height(20.dp))
+    }
+    val aniUrl by remember {
+        mutableStateOf(getWeatherAnimationUrl(weatherData.weather?.get(0)?.icon))
+    }
+    Log.d("zini", aniUrl)
+    val composition by rememberLottieComposition(
+        spec =
+        LottieCompositionSpec.Url("https://assets2.lottiefiles.com/private_files/lf30_yh3ay76n.json")
+    )
+    val lottieAnimatable = rememberLottieAnimatable()
+    LaunchedEffect(composition) {
+        lottieAnimatable.animate(
+            composition = composition,
+            clipSpec = LottieClipSpec.Frame(0, 1200),
+            initialProgress = 0f
+        )
+    }
+    Box(modifier = Modifier.fillMaxSize()) {
+        LottieAnimation(composition = composition, iterations = LottieConstants.IterateForever, contentScale = ContentScale.Crop)
         Column(
-            modifier = Modifier
-                .padding(top = 0.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize()
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Image(
-                    painter = painterResource(
-                        id = getWeatherImage(state.data.weather[0]!!.icon!!)
-                    ),
-                    contentDescription = "",
-                    modifier = Modifier.size(200.dp)
-                        .padding(top = 30.dp)
-                )
-                Text(
-                    text = temp,
-                    modifier = Modifier
-                        .padding(start = 10.dp)
-                        .graphicsLayer(alpha = 0.99f)
-                        .drawWithCache {
-                            val brush = Brush.verticalGradient(
-                                listOf(
-                                    Color.White,
-                                    skyblue
-                                )
-                            )
-                            onDrawWithContent {
-                                drawContent()
-                                drawRect(
-                                    brush,
-                                    blendMode = BlendMode.SrcAtop
-                                )
-                            }
-                        },
-                    fontSize = 45.sp,
-                    fontWeight = FontWeight.W700,
-                    lineHeight = 60.sp,
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = description,
-                    color = sky,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    modifier = Modifier.padding(top = 50.dp)
-                )
-                Text(
-                    modifier = Modifier
-                        .padding(top = 15.dp),
-                    text = feelTemp,
-                    color = sky,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End,
-                )
-                Text(
-                    modifier = Modifier
-                        .padding(top = 15.dp),
-                    text = humidipy,
-                    color = sky,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.End,
-                )
+            Row(modifier = Modifier.fillMaxWidth().padding(bottom = 5.dp, end = 10.dp, top = 10.dp), horizontalArrangement = Arrangement.End) {
+                Icon(Icons.Default.LocationOn, contentDescription = "위치 아이콘")
+                Text(text = weatherData.name ?: "", fontSize = 14.sp)
+            }
+            Row(modifier = Modifier.fillMaxWidth().padding(end = 10.dp), horizontalArrangement = Arrangement.End) {
+                Text(text = temp, fontSize = 14.sp)
             }
         }
     }
+
 }
