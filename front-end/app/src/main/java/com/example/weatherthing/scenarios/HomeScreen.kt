@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.airbnb.lottie.compose.*
+import com.example.weatherthing.data.WeatherData
 import com.example.weatherthing.utils.getWeatherAnimationUrl
 import com.example.weatherthing.viewModel.MainViewModel
 import com.example.weatherthing.viewModel.WeatherState
@@ -39,7 +40,7 @@ fun Home(viewModel: MainViewModel, navController: NavHostController) {
                     }
                 }
                 is WeatherState.Loaded -> {
-                    ShowWeather(state)
+                    ShowWeather(state.data)
                 }
             }
         }
@@ -47,12 +48,11 @@ fun Home(viewModel: MainViewModel, navController: NavHostController) {
 }
 
 @Composable
-private fun ShowWeather(state: WeatherState.Loaded) {
-    val weatherData = state.data
+private fun ShowWeather(weatherData: WeatherData) {
     val temp by remember {
         mutableStateOf(
             weatherData.main?.temp?.let {
-                "${ (it - 273.15 ).toInt()}°C"
+                "${ (it - 273.15).toInt()}°C"
             } ?: "-°C"
         )
     }
@@ -62,16 +62,9 @@ private fun ShowWeather(state: WeatherState.Loaded) {
     Log.d("zini", aniUrl)
     val composition by rememberLottieComposition(
         spec =
-        LottieCompositionSpec.Url("https://assets2.lottiefiles.com/private_files/lf30_yh3ay76n.json")
+        LottieCompositionSpec.Url(aniUrl)
     )
     val lottieAnimatable = rememberLottieAnimatable()
-    LaunchedEffect(composition) {
-        lottieAnimatable.animate(
-            composition = composition,
-            clipSpec = LottieClipSpec.Frame(0, 1200),
-            initialProgress = 0f
-        )
-    }
     Box(modifier = Modifier.fillMaxSize()) {
         LottieAnimation(composition = composition, iterations = LottieConstants.IterateForever, contentScale = ContentScale.Crop)
         Column(
@@ -86,5 +79,11 @@ private fun ShowWeather(state: WeatherState.Loaded) {
             }
         }
     }
-
+    LaunchedEffect(composition) {
+        lottieAnimatable.animate(
+            composition = composition,
+            clipSpec = LottieClipSpec.Frame(0, 1200),
+            initialProgress = 0f
+        )
+    }
 }
