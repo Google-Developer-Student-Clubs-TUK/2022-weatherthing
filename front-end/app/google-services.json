@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "551809083369",
+    "project_id": "weather-thing-3ab9b",
+    "storage_bucket": "weather-thing-3ab9b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:551809083369:android:094e06487a54e749894d78",
+        "android_client_info": {
+          "package_name": "com.example.weatherthing"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "551809083369-7fbtn99f8rcfdkido25407gfla0opaic.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.weatherthing",
+            "certificate_hash": "ce97042d9cbf204aab2b0a90b4de9b941aaece3d"
+          }
+        },
+        {
+          "client_id": "551809083369-uvlcbvdbp30kr4rmmpad7kus988lela4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.weatherthing",
+            "certificate_hash": "b48a0535a3f2afdd06e41f63a8203c6eb5f3d8ec"
+          }
+        },
+        {
+          "client_id": "551809083369-48infoeiufog36f24l9r8li509an4jir.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZgZelB6b9E08Y_y_oUP1GPChofpDmVps"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "551809083369-48infoeiufog36f24l9r8li509an4jir.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
