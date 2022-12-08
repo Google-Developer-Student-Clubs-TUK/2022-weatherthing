@@ -1,88 +1,99 @@
 package com.example.weatherthing.scenarios.intro
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
+import androidx.compose.material.ExposedDropdownMenuDefaults.TrailingIcon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.airbnb.lottie.compose.*
-import com.example.weatherthing.utils.weatherPagerContent
+import androidx.navigation.NavHostController
 import com.example.weatherthing.viewModel.StartViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SignUpScreen(viewModel: StartViewModel) {
-    Box(modifier = Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
-        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+fun SignUpScreen(viewModel: StartViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), navController: NavHostController) {
+    val (name, setName) = remember {
+        mutableStateOf("")
+    }
+    val genderOptions = mapOf<Int, String>(1 to "남", 0 to "여")
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptionText by remember { mutableStateOf(genderOptions[1]) }
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                backgroundColor = Color.Transparent,
+                title = { Text(text = "회원가입") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Filled.ArrowBack, contentDescription = "뒤로가기")
+                    }
+                }
+            )
+        }
+    ) {
+        Column(modifier = Modifier.padding(it).fillMaxWidth()) {
             Text(
-                text = "어떤 날씨가 떠오르시나요?\n당신의 날씨를 선택해주세요!",
+                text = "당신의 정보를 입력해주세요",
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold
             )
-            WeatherPager(viewModel)
-        }
-    }
-}
-
-@OptIn(ExperimentalPagerApi::class)
-@Composable
-fun ColumnScope.WeatherPager(viewModel: StartViewModel) {
-    val pagerState = rememberPagerState()
-    val weatherItems = weatherPagerContent()
-    var selectedItem by remember {
-        mutableStateOf(0)
-    }
-//    val lottieAnimatable = rememberLottieAnimatable()
-
-    val compositionList = weatherItems.map {
-        rememberLottieAnimatable() to rememberLottieComposition(
-            spec =
-            LottieCompositionSpec.Url(it.animationUrl)
-        )
-    }
-
-    HorizontalPager(
-        count = weatherItems.size,
-        state = pagerState,
-        modifier = Modifier.padding(30.dp).weight(1f)
-    ) { currentPage ->
-        Card(
-            backgroundColor = Color.White,
-            shape = MaterialTheme.shapes.large,
-            elevation = 7.dp,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            LottieAnimation(
-                composition = compositionList[currentPage].second.value,
-                iterations = LottieConstants.IterateForever,
-                contentScale = ContentScale.Inside
+            Text(
+                text = "닉네임",
+                textAlign = TextAlign.Center,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
             )
-        }
-    }
-
-    Button(onClick = { viewModel.sign() }, colors = ButtonDefaults.buttonColors(Color.White)) {
-        Text(text = "\'${weatherItems[selectedItem].title}\'${if (selectedItem%2==0)"으로" else "로"} 시작하기${weatherItems[selectedItem].icon}")
-    }
-    LaunchedEffect(pagerState.currentPage){
-        selectedItem = pagerState.currentPage
-    }
-
-    LaunchedEffect(compositionList) {
-        compositionList.forEach { (player, composition) ->
-            player.animate(
-                composition = composition.value,
-                clipSpec = LottieClipSpec.Frame(0, 1200),
-                initialProgress = 0f
+            TextField(value = name, onValueChange = setName)
+            Text(
+                text = "나이",
+                textAlign = TextAlign.Center,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
             )
+            ExposedDropdownMenuBox(
+                expanded = expanded,
+                onExpandedChange = {
+                    expanded = !expanded
+                }
+            ) {
+                TextField(
+                    readOnly = true,
+                    value = selectedOptionText!!,
+                    onValueChange = { },
+                    trailingIcon = {
+                        Icons.Filled.ArrowDownward
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors()
+                )
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = {
+                        expanded = false
+                    }
+                ) {
+                    genderOptions.values.forEach { selectionOption ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedOptionText = selectionOption
+                                expanded = false
+                            }
+                        ) {
+                            Text(text = selectionOption)
+                        }
+                    }
+                }
+            }
+            Button(onClick = { viewModel.sign() }) {
+            }
         }
     }
 }
