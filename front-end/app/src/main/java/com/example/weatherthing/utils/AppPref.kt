@@ -11,7 +11,7 @@ class AppPref(context: Context) {
     fun getUserPref(): User? {
         val uId = getString("uId")
         return if (uId != null) {
-            User(uId = uId, nickname = getString("nickname") ?: "", email = getString("email") ?: "", age = getInt("age"), gender = getInt("gender"))
+            User(uId = uId, nickname = getString("nickname") ?: "", email = getString("email") ?: "", age = getInt("age"), gender = getInt("gender"), weather = getInt("weather"))
         } else {
             null
         }
@@ -23,6 +23,7 @@ class AppPref(context: Context) {
         setString("nickname", user.nickname)
         setInt("age", user.age)
         setInt("gender", user.gender)
+        setInt("weather", user.weather)
     }
 
     private fun setString(key: String, value: String) {

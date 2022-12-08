@@ -16,12 +16,12 @@ sealed class LoginState {
     object RequireRegister : LoginState()
 }
 
-//sealed class SplashEvent {
+// sealed class SplashEvent {
 //    object DisconnectedNetwork : SplashEvent()
 //    object Banned : SplashEvent()
 //    object Shutdown : SplashEvent()
 //    object Success : SplashEvent()
-//}
+// }
 
 class StartViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
@@ -52,8 +52,9 @@ class StartViewModel : ViewModel() {
         }
     }
 
-    fun sign() {
+    fun sign(): Boolean {
         loginState.value = LoginState.CompleteLogin
+        return true
     }
 
     fun checkLogin() {

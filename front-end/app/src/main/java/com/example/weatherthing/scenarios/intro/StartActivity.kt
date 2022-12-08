@@ -22,9 +22,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.weatherthing.R
-import com.example.weatherthing.scenarios.MainActivity
-import com.example.weatherthing.scenarios.SplashScreen
+import com.example.weatherthing.scenarios.main.MainActivity
 import com.example.weatherthing.viewModel.LoginState
 import com.example.weatherthing.viewModel.StartViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -65,14 +68,12 @@ class StartActivity : ComponentActivity() {
                     }
                     LoginState.RequireRegister -> {
                         setContent {
-                            SignUpScreen(viewModel)
+                            val navController = rememberNavController()
+                            Screen(startRoute = "Weather", navController = navController)
                         }
                     }
                     LoginState.CompleteLogin -> {
-//                        toMainActivity()
-                        setContent {
-                            SignUpScreen(viewModel)
-                        }
+                        toMainActivity()
                     }
                 }
             }
@@ -130,12 +131,33 @@ class StartActivity : ComponentActivity() {
     }
 }
 
+sealed class StartScreen(val title: String, val route: String) {
+    object SignUp : StartScreen("유저 정보 입력 페이지", "SignUp")
+    object WeatherSel : StartScreen("날씨 선택 페이지", "Weather")
+}
+
+@Composable
+fun Screen(startRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
+    // NavHost 로 네비게이션 결정
+    NavHost(navController, startRoute) {
+        composable(StartScreen.SignUp.route) {
+            SignUpScreen(navController = navController)
+        }
+        composable(StartScreen.WeatherSel.route) {
+            WeatherSelectScreen(navController)
+        }
+    }
+}
+
 @Composable
 fun ColumnScope.SignInGoogleButton(onClick: () -> Unit) {
     Card(
         modifier = Modifier
-            .clickable(onClick = onClick).padding(horizontal = 20.dp)
-            .fillMaxWidth().height(55.dp).background(Color.Transparent),
+            .clickable(onClick = onClick)
+            .padding(horizontal = 20.dp)
+            .fillMaxWidth()
+            .height(55.dp)
+            .background(Color.Transparent),
         shape = MaterialTheme.shapes.medium,
         elevation = 5.dp
     ) {

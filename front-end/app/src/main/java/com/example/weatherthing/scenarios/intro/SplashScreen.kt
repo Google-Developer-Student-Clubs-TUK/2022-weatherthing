@@ -1,4 +1,4 @@
-package com.example.weatherthing.scenarios
+package com.example.weatherthing.scenarios.intro
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface

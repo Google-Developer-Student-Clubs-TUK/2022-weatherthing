@@ -1,4 +1,4 @@
-package com.example.weatherthing.scenarios
+package com.example.weatherthing.scenarios.main
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -14,12 +14,26 @@ import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.material.BottomNavigation
+import androidx.compose.material.BottomNavigationItem
+import androidx.compose.material.Icon
+import androidx.compose.material.Scaffold
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.core.app.ActivityCompat
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.example.weatherthing.screen.Screen
+import androidx.navigation.navArgument
+import com.example.weatherthing.scenarios.Home
+import com.example.weatherthing.scenarios.main.chat.ChatListScreen
 import com.example.weatherthing.viewModel.MainViewModel
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.common.api.ResolvableApiException
@@ -29,11 +43,17 @@ import com.google.android.gms.tasks.CancellationTokenSource
 import com.google.android.gms.tasks.OnTokenCanceledListener
 import com.google.android.gms.tasks.Task
 
+sealed class BottomNavItem(val title: String, val icon: ImageVector, val route: String) {
+    object BoardScreen : BottomNavItem("게시판", Icons.Filled.Home, "Post")
+    object UserScreen : BottomNavItem("매칭 유저", Icons.Filled.Person, "SEARCH")
+    object ChatListScreen : BottomNavItem("채팅목록", Icons.Filled.MailOutline, "SHORTVIDEO")
+    object MyPageScreen : BottomNavItem("마이페이지", Icons.Filled.Person, "MYPAGE")
+}
+
 class MainActivity : ComponentActivity(), LocationListener {
     lateinit var fusedLocationClient: FusedLocationProviderClient
     private val viewModel: MainViewModel by viewModels()
 
-    @OptIn(ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -44,15 +64,9 @@ class MainActivity : ComponentActivity(), LocationListener {
 
         setContent {
             val navController = rememberNavController()
-            NavHost(
-                navController = navController,
-                startDestination = Screen.Home.route
-            ) {
-                composable(
-                    route = Screen.Home.route
-                ) {
-                    Home(viewModel = viewModel, navController = navController)
-                }
+
+            Scaffold(bottomBar = { BottomNavigationBar(items = listOf(BottomNavItem.BoardScreen, BottomNavItem.UserScreen, BottomNavItem.ChatListScreen, BottomNavItem.MyPageScreen), navController = navController) }) {
+                Screen(mainViewModel = viewModel, startRoute = BottomNavItem.BoardScreen.route, navController = navController)
             }
         }
     }
@@ -195,5 +209,44 @@ class MainActivity : ComponentActivity(), LocationListener {
 
     override fun onLocationChanged(p0: Location) {
         viewModel.getCurrentWeather(p0.latitude, p0.longitude)
+    }
+}
+
+@Composable
+fun Screen(mainViewModel: MainViewModel, startRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
+    // NavHost 로 네비게이션 결정
+    NavHost(navController, startRoute) {
+        composable(BottomNavItem.BoardScreen.route) {
+            Home(viewModel = mainViewModel, navController = navController)
+        }
+        composable(
+            "${BottomNavItem.MyPageScreen.route}/{userId}",
+            arguments = listOf(
+                navArgument("userId") { type = NavType.StringType }
+            )
+        ) {
+        }
+        composable(BottomNavItem.ChatListScreen.route) {
+            ChatListScreen(navController = navController)
+        }
+        composable(BottomNavItem.UserScreen.route) {
+        }
+    }
+}
+
+@Composable
+fun BottomNavigationBar(items: List<BottomNavItem>, navController: NavHostController, modifier: Modifier = Modifier) {
+    val backStackEntry = navController.currentBackStackEntryAsState()
+    BottomNavigation(backgroundColor = Color.White, modifier = modifier) {
+        items.forEach { item ->
+            val selected = item.route == backStackEntry.value?.destination?.route
+            BottomNavigationItem(
+                selected = selected,
+                onClick = { navController.navigate(item.route) },
+                icon = {
+                    Icon(imageVector = item.icon, contentDescription = item.title)
+                }
+            )
+        }
     }
 }
