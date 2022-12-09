@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.weatherthing.data.Chat
 import com.example.weatherthing.data.ChatRoom
 import com.example.weatherthing.data.ChatUser
+import com.example.weatherthing.data.fbSnapshotToChatroom
 import com.example.weatherthing.utils.App
 import com.example.weatherthing.utils.AppPref
 import com.google.firebase.database.DataSnapshot
@@ -47,7 +48,6 @@ class ChatListViewModel : ViewModel() {
                 Log.d(ContentValues.TAG, "loadMessage:onCancelled", error.toException())
             }
         }
-
         reference.addValueEventListener(listener)
 
         awaitClose {
@@ -56,6 +56,7 @@ class ChatListViewModel : ViewModel() {
     }.shareIn(scope, SharingStarted.Eagerly)
 
     private fun getChatData(snapshot: DataSnapshot) {
+        val _chatRooms = emptyList<ChatRoom>()
         snapshot.value?.let {
             val list = it as ArrayList<String>
             list.forEach { e ->
@@ -63,54 +64,22 @@ class ChatListViewModel : ViewModel() {
                     viewModelScope,
                     firebaseDB.reference.child("chat").child(e)
                 ) { dataSnapshot ->
-                    toChatData(dataSnapshot)
-                }
-            }
-        }
-    }
-
-    private fun toChatData(snapshot: DataSnapshot) {
-        snapshot.value?.let { it ->
-            val result = it as HashMap<String, Any>?
-            val userA = result?.get("userA") as HashMap<String, Any>?
-            val userB = result?.get("userB") as HashMap<String, Any>?
-            val _chats = result?.get("chats") as ArrayList<HashMap<String, Any>>
-            var chats: ArrayList<Chat>? = null
-
-            if (!_chats.isNullOrEmpty()) {
-                _chats.forEach { chat ->
-                    if (chats.isNullOrEmpty()) {
-                        chats = arrayListOf(
-                            Chat(
-                                from = chat["from"] as String,
-                                contents = chat["contents"] as String,
-                                createdAt = chat["createdAt"] as String
-                            )
-                        )
-                    } else {
-                        chats!!.add(
-                            Chat(
-                                from = chat["from"] as String,
-                                contents = chat["contents"] as String,
-                                createdAt = chat["createdAt"] as String
-                            )
-                        )
+                    var isExist = false
+                    val _chatRoom = fbSnapshotToChatroom(dataSnapshot)
+                    for (chatroom in chatRooms.value) {
+                        if (chatroom.id == _chatRoom?.id) {
+                            val index = chatRooms.value.indexOf(chatroom)
+                            chatRooms.value = chatRooms.value.drop(index)
+                            chatRooms.value.plus(_chatRoom)
+                            isExist = true
+                        }
+                    }
+                    if (!isExist) {
+                        _chatRooms.plus(_chatRoom)
                     }
                 }
             }
-            val _chatroom = ChatRoom(
-                result?.get("id") as String,
-                result.get("createdAt") as String,
-                ChatUser(userA?.get("id") as String, userA["nickname"] as String),
-                ChatUser(userB?.get("id") as String, userA["nickname"] as String),
-                chats!!.toList()
-            )
-
-            if (chatRooms.value.isEmpty()) {
-                chatRooms.value = listOf(_chatroom)
-            } else {
-                chatRooms.value += _chatroom
-            }
         }
+        chatRooms.value = _chatRooms
     }
 }
