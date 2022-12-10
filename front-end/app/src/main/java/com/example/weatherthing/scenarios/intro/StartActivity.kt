@@ -23,9 +23,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.weatherthing.R
 import com.example.weatherthing.scenarios.main.MainActivity
 import com.example.weatherthing.viewModel.LoginState
@@ -140,8 +142,13 @@ sealed class StartScreen(val title: String, val route: String) {
 fun Screen(startRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute) {
-        composable(StartScreen.SignUp.route) {
-            SignUpScreen(navController = navController)
+        composable(
+            "${StartScreen.SignUp.route}/{weatherCode}",
+            arguments = listOf(
+                navArgument("weatherCode") { type = NavType.IntType }
+            )
+        ) {
+            SignUpScreen(navController = navController, weatherCode = it.arguments?.getInt("weatherCode")?:0)
         }
         composable(StartScreen.WeatherSel.route) {
             WeatherSelectScreen(navController)

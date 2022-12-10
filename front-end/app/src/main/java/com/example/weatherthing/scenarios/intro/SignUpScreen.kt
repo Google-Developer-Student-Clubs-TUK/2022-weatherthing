@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
-import androidx.compose.material.ExposedDropdownMenuDefaults.TrailingIcon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -19,13 +18,22 @@ import com.example.weatherthing.viewModel.StartViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SignUpScreen(viewModel: StartViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), navController: NavHostController) {
-    val (name, setName) = remember {
+fun SignUpScreen(viewModel: StartViewModel = androidx.lifecycle.viewmodel.compose.viewModel(), navController: NavHostController, weatherCode: Int) {
+    val (nickname, setNickname) = remember {
         mutableStateOf("")
     }
-    val genderOptions = mapOf<Int, String>(1 to "남", 0 to "여")
+    var selectedAge by remember {
+        mutableStateOf(20)
+    }
+
+    val genderOptions = mapOf("남" to 1, "여" to 0)
     var expanded by remember { mutableStateOf(false) }
-    var selectedOptionText by remember { mutableStateOf(genderOptions[1]) }
+    var expandedAge by remember { mutableStateOf(false) }
+    var gender by remember {
+        mutableStateOf("남")
+    }
+    val genderKey by remember { mutableStateOf(genderOptions[gender]) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -52,9 +60,9 @@ fun SignUpScreen(viewModel: StartViewModel = androidx.lifecycle.viewmodel.compos
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
             )
-            TextField(value = name, onValueChange = setName)
+            TextField(value = nickname, onValueChange = setNickname)
             Text(
-                text = "나이",
+                text = "성별",
                 textAlign = TextAlign.Center,
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Bold
@@ -67,7 +75,7 @@ fun SignUpScreen(viewModel: StartViewModel = androidx.lifecycle.viewmodel.compos
             ) {
                 TextField(
                     readOnly = true,
-                    value = selectedOptionText!!,
+                    value = gender,
                     onValueChange = { },
                     trailingIcon = {
                         Icons.Filled.ArrowDownward
@@ -80,20 +88,62 @@ fun SignUpScreen(viewModel: StartViewModel = androidx.lifecycle.viewmodel.compos
                         expanded = false
                     }
                 ) {
-                    genderOptions.values.forEach { selectionOption ->
+                    genderOptions.keys.forEach { option ->
                         DropdownMenuItem(
                             onClick = {
-                                selectedOptionText = selectionOption
+                                gender = option
                                 expanded = false
                             }
                         ) {
-                            Text(text = selectionOption)
+                            Text(text = option)
                         }
                     }
                 }
             }
-            Button(onClick = { viewModel.sign() }) {
+            Text(
+                text = "나이",
+                textAlign = TextAlign.Center,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
+            ExposedDropdownMenuBox(
+                expanded = expandedAge,
+                onExpandedChange = {
+                    expandedAge = !expandedAge
+                }
+            ) {
+                TextField(
+                    readOnly = true,
+                    value = selectedAge.toString(),
+                    onValueChange = { },
+                    trailingIcon = {
+                        Icons.Filled.ArrowDownward
+                    },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors()
+                )
+                ExposedDropdownMenu(
+                    expanded = expandedAge,
+                    onDismissRequest = {
+                        expandedAge = false
+                    }
+                ) {
+                    (20..40).forEach { option ->
+                        DropdownMenuItem(
+                            onClick = {
+                                selectedAge = option
+                                expandedAge = false
+                            }
+                        ) {
+                            Text(text = option.toString())
+                        }
+                    }
+                }
             }
+            Button(onClick = {
+                if (nickname != "") {
+                    viewModel.sign(nickname, selectedAge, gender = genderKey ?: 0, weatherCode)
+                }
+            }) {}
         }
     }
 }

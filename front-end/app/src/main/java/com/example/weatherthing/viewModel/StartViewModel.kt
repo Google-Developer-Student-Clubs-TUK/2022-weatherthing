@@ -3,7 +3,9 @@ package com.example.weatherthing.viewModel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherthing.data.User
 import com.example.weatherthing.utils.App
+import com.example.weatherthing.utils.AppPref
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.*
@@ -26,6 +28,8 @@ sealed class LoginState {
 class StartViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     val loginState = MutableStateFlow<LoginState>(LoginState.Loading)
+    val pref = AppPref(App.context)
+    val prefUser = pref.getUserPref()
 
     init {
         viewModelScope.launch {
@@ -37,9 +41,16 @@ class StartViewModel : ViewModel() {
                     },
                     async {
                         if (getLastSignedInAccount(App.context)) {
-                            if ("SHARED_VALUE" == "SHARED_VALUE") {
+                            if (prefUser != null) {
                                 LoginState.CompleteLogin
                             } else {
+                                // val user : User? = db get
+//                                if(user != null){
+//                                    pref.setUserPref(user)
+//                                    LoginState.CompleteLogin
+//                                }else{
+//                                    LoginState.RequireRegister
+//                                }
                                 LoginState.RequireRegister
                             }
                         } else {
@@ -52,20 +63,27 @@ class StartViewModel : ViewModel() {
         }
     }
 
-    fun sign(): Boolean {
-        loginState.value = LoginState.CompleteLogin
-        return true
+    fun sign(nickname: String, age: Int, gender: Int, weather: Int) {
+        auth.currentUser?.let {
+            val user = User(it.uid, it.email ?: "", nickname, gender, age, weather)
+            pref.setUserPref(user)
+            loginState.value = LoginState.CompleteLogin
+        }
     }
 
-    fun checkLogin() {
+    fun checkAfterGoogleLogin() { // 구글 로그인 완료 후
         // sharedPreference에 저장된 데이터가 있으면 가입된 유저라고 간주
-        val a = 0
-        viewModelScope.launch {
-            if (true) {
-                loginState.value = LoginState.RequireRegister
-            } else {
-                loginState.value = LoginState.CompleteLogin
-            }
+        loginState.value = if (prefUser != null) {
+            LoginState.CompleteLogin
+        } else {
+            // val user : User? = db get
+//                                if(user != null){
+//                                    pref.setUserPref(user)
+//                                    LoginState.CompleteLogin
+//                                }else{
+//                                    LoginState.RequireRegister
+//                                }
+            LoginState.RequireRegister
         }
     }
 

@@ -72,9 +72,7 @@ fun ColumnScope.WeatherPager(navController: NavHostController, viewModel: StartV
 
     Button(
         onClick = {
-            if (viewModel.sign()) {
-                navController.navigate("SignUp")
-            }
+            navController.navigate("SignUp/$selectedItem")
         },
         colors = ButtonDefaults.buttonColors(Color.White)
     ) {
