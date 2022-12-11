@@ -47,14 +47,15 @@ class ChatViewModel : ViewModel() {
     fun enterChatRoom(chatId: String) {
         // 한번도 채팅하지 않은경우는 조회 불가
         Log.d("채팅방 id", chatId)
-        fbGetValue(firebaseDB.reference.child("chat").child(chatId)){
+        fbGetValue(firebaseDB.reference.child("chat").child(chatId)) {
             setListener(it)
         }
 
-        val chatListener = fbChatListener(viewModelScope, firebaseDB.reference.child("chat").child(chatId).child("messages")){updateChats(it)
+        val chatListener = fbChatListener(viewModelScope, firebaseDB.reference.child("chat").child(chatId).child("messages")) {
+            updateChats(it)
         }
     }
-    private fun setListener(dataSnapshot: DataSnapshot){
+    private fun setListener(dataSnapshot: DataSnapshot) {
         val _chatRoom = fbSnapshotToChatroom(dataSnapshot)
 
         if (fbSnapshotToChatroom(dataSnapshot) != null) {
@@ -62,7 +63,7 @@ class ChatViewModel : ViewModel() {
         }
     }
 
-    private fun updateChats(snapshot: DataSnapshot){
+    private fun updateChats(snapshot: DataSnapshot) {
         val _chats = arrayListOf<Chat>()
         val data = snapshot.value as ArrayList<HashMap<String, Any>>?
 
@@ -108,10 +109,9 @@ class ChatViewModel : ViewModel() {
         } else {
             chats.value += chat
             Log.d("추가됨", chats.value.toString())
-            fbSetValue(firebaseDB.reference.child("chat").child(chatId).child("messages"), chats.value){}
+            fbSetValue(firebaseDB.reference.child("chat").child(chatId).child("messages"), chats.value) {}
         }
     }
-
 
     private fun newChatRoom(chatId: String, chat: List<Chat>) {
         val timeStamp: String = SimpleDateFormat(
@@ -124,16 +124,16 @@ class ChatViewModel : ViewModel() {
                 val me = ChatUser(user!!.uId, user!!.nickname)
                 val chatroomData = ChatRoom(chatId, timeStamp, notMe, me, chat)
 
-                fbSetValue(firebaseDB.reference.child("chat").child(chatId), chatroomData){enterChatRoom(chatId)}
+                fbSetValue(firebaseDB.reference.child("chat").child(chatId), chatroomData) { enterChatRoom(chatId) }
                 Log.d("유저 채팅 리스트1", chatRoomList.value.toString())
-                    chatRoomList.value += chatId
+                chatRoomList.value += chatId
                 Log.d("유저 채팅 리스트", chatRoomList.value.toString())
 
-                fbSetValue(firebaseDB.reference.child("user").child(user!!.uId), chatRoomList.value){enterChatRoom(chatId)}
+                fbSetValue(firebaseDB.reference.child("user").child(user!!.uId), chatRoomList.value) { enterChatRoom(chatId) }
             }
         }
     }
-    private fun fbGetValue(reference: DatabaseReference, onSuccess: (DataSnapshot) -> Unit){
+    private fun fbGetValue(reference: DatabaseReference, onSuccess: (DataSnapshot) -> Unit) {
         reference.get()
             .addOnSuccessListener {
                 onSuccess(it)
@@ -143,8 +143,8 @@ class ChatViewModel : ViewModel() {
             }
     }
 
-    private fun fbSetValue(reference: DatabaseReference, data: Any, onSuccess: ()-> Unit){
-       reference.setValue(data)
+    private fun fbSetValue(reference: DatabaseReference, data: Any, onSuccess: () -> Unit) {
+        reference.setValue(data)
             .addOnSuccessListener {
                 Log.d("newChatRoomSuccess", "유저 정보에 추가 완료")
                 onSuccess()
@@ -153,6 +153,4 @@ class ChatViewModel : ViewModel() {
                 Log.d("유저 정보 추가 실패", it.toString())
             }
     }
-
-
 }

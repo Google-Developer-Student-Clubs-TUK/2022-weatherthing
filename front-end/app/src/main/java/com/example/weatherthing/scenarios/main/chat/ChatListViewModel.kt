@@ -4,9 +4,7 @@ import android.content.ContentValues
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.weatherthing.data.Chat
 import com.example.weatherthing.data.ChatRoom
-import com.example.weatherthing.data.ChatUser
 import com.example.weatherthing.data.fbSnapshotToChatroom
 import com.example.weatherthing.utils.App
 import com.example.weatherthing.utils.AppPref
@@ -21,6 +19,7 @@ import kotlinx.coroutines.flow.*
 
 class ChatListViewModel : ViewModel() {
     val chatRooms = MutableStateFlow<List<ChatRoom>>(emptyList())
+    private val chatIdList = MutableStateFlow<List<String>>(emptyList())
     val user = AppPref(App.context).getUserPref()!!
 
     private val firebaseDB = FirebaseDatabase.getInstance()
@@ -56,30 +55,21 @@ class ChatListViewModel : ViewModel() {
     }.shareIn(scope, SharingStarted.Eagerly)
 
     private fun getChatData(snapshot: DataSnapshot) {
-        val _chatRooms = emptyList<ChatRoom>()
         snapshot.value?.let {
             val list = it as ArrayList<String>
-            list.forEach { e ->
-                fbChatListener(
-                    viewModelScope,
-                    firebaseDB.reference.child("chat").child(e)
-                ) { dataSnapshot ->
-                    var isExist = false
-                    val _chatRoom = fbSnapshotToChatroom(dataSnapshot)
-                    for (chatroom in chatRooms.value) {
-                        if (chatroom.id == _chatRoom?.id) {
-                            val index = chatRooms.value.indexOf(chatroom)
-                            chatRooms.value = chatRooms.value.drop(index)
-                            chatRooms.value.plus(_chatRoom)
-                            isExist = true
-                        }
-                    }
-                    if (!isExist) {
-                        _chatRooms.plus(_chatRoom)
+            list.forEach { id ->
+                if (!chatIdList.value.contains(id)) {
+                    fbChatListener(
+                        viewModelScope,
+                        firebaseDB.reference.child("chat").child(id)
+                    ) { dataSnapshot ->
+                        val _chatRoom = fbSnapshotToChatroom(dataSnapshot)
+                        chatRooms.value = chatRooms.value.filterNot { chatRoom: ChatRoom -> chatRoom.id == _chatRoom?.id }
+                        chatRooms.value.plus(_chatRoom)
                     }
                 }
             }
+            chatIdList.value = list
         }
-        chatRooms.value = _chatRooms
     }
 }
