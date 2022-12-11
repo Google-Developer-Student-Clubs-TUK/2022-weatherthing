@@ -1,37 +1,28 @@
 package com.weatherthing.project.board.entity;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-/**
- * @author : 박수현
- * @version : 1.0.0
- * @package : com.weatherthing.board.entity
- * @name : Board
- * @create-date: 2022.12.01
- * @update-date :
- * @update-author : 000
- * @update-description :
- */
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = false)
-@AllArgsConstructor
+@Getter
 @NoArgsConstructor
-@Table(name = "board")
-@Builder
-public class Board{
+public class Board extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String title;
 
     @Column(nullable = false)
     private String contents;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private User user;
 
     @Column(nullable = false)
     @Builder.Default
