@@ -1,5 +1,6 @@
 package com.weatherthing.project.board.entity;
 
+import com.weatherthing.project.board.dto.BoardRequestDto;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,4 +28,21 @@ public class Board extends BaseTimeEntity {
     @Column(nullable = false)
     @Builder.Default
     private boolean isDeleted = Boolean.FALSE;
+
+
+
+    public Board(BoardRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+    }
+    public void Update(BoardRequestDto requestDto) {
+        this.title = requestDto.getTitle();
+        this.contents = requestDto.getContents();
+    }
+
+    public void addUser(User user) {
+        this.user = user;
+        user.getBoards().add(this);
+    }
+
 }
