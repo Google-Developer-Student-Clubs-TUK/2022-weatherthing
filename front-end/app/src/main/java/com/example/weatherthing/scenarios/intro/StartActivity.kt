@@ -126,7 +126,7 @@ class StartActivity : ComponentActivity() {
         auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
                 auth.currentUser?.let {
-                    viewModel.checkLogin()
+                    viewModel.checkAfterGoogleLogin()
                 }
             }
         }
