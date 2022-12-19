@@ -26,5 +26,12 @@ public class BoardController {
         return ResponseEntity.ok(boardService.write(boardDto, user));
     }
 
+    // 전체 게시글 조회
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/boards")
+    public ResponseEntity getBoards() {
+        return ResponseEntity.ok(boardService.getBoards());
+    }
+
 
 }
