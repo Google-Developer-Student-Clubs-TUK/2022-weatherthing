@@ -11,12 +11,14 @@ import java.time.LocalDateTime;
 
 @Getter
 @MappedSuperclass
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners(AuditingEntityListener.class) // 변경되었을 때 자동으로 기록합니다.
 public abstract class BaseTimeEntity {
 
-    @CreatedDate  //최초 생성 시점
-    private LocalDateTime createAt;
+    @CreatedDate // 최초 생성 시점
+    private LocalDateTime createdAt;
 
-    @LastModifiedDate  // 마지막 변경 시점
+    @LastModifiedDate // 마지막 변경 시점
     private LocalDateTime updateAt;
+
+
 }

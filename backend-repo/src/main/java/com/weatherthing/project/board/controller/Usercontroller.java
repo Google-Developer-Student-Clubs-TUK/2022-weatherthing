@@ -1,24 +1,23 @@
 package com.weatherthing.project.board.controller;
 
-import com.weatherthing.project.board.dto.UserInfoDto;
+
+import com.weatherthing.project.board.dto.RegisterDto;
 import com.weatherthing.project.board.service.UserService;
-import com.weatherthing.project.global.Response;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-public class Usercontroller {
-
+@RequestMapping(value = "api/v1")
+public class UserController {
     private final UserService userService;
 
-    @PostMapping("/auth")
+
     @ResponseStatus(HttpStatus.CREATED)
-    public Response<?> signup(UserInfoDto userInfoDto) {
-        return new Response<>("true", "가입 성공", userService.userinfo(userInfoDto));
+    @PostMapping("/auth")
+    public ResponseEntity register(@RequestBody RegisterDto registerDto) {
+        return ResponseEntity.ok(userService.register(registerDto));
     }
 }

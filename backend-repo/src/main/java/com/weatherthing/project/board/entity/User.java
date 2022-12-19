@@ -1,44 +1,44 @@
 package com.weatherthing.project.board.entity;
 
-import lombok.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Data
-@Entity
 @NoArgsConstructor
 @AllArgsConstructor
-
-public class User {
+@Entity
+@Table(name = "Users")
+public class User extends BaseTimeEntity{
 
     @Id
-    private Long uId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private Long uid;
 
     @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false, unique = true)
+    private String nickname;
+
     @Column(nullable = false)
-    private Long age;
+    private Integer age;
 
     @Column(nullable = false, name = "eco_score")
-    private Long ecoScore;
+    private Integer ecoScore;
 
     @Column(nullable = false, name = "gender_code")
-    private Long genderCode;
+    private Integer genderCode;
 
-//    @Column(nullable = false, name = "region_code")
-//    private Long regionCode;
-//
-//    @Column(nullable = false, name = "weather_code")
-//    private Long weatherCode;
+    @Column(nullable = false, name = "region_code")
+    private Integer regionCode;
 
-//    @Column(nullable = false)
-//    @Builder.Default
-//    private boolean isDeleted = Boolean.FALSE;
-
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "user")
-//    private List<Board> boards = new ArrayList<>();
+    @Column(nullable = false, name = "weather_code")
+    private Integer weatherCode;
 }
