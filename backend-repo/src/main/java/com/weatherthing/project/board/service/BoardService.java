@@ -39,4 +39,14 @@ public class BoardService {
         return BoardDto.toDto(board);
     }
 
+    // 개별 게시물 조회
+    @Transactional(readOnly = true)
+    public BoardDto getBoard(Long id) {
+        Board board = boardRepository.findById(id).orElseThrow(() -> {
+            return new IllegalArgumentException("Board Id를 찾을 수 없습니다.");
+        });
+        BoardDto boardDto = BoardDto.toDto(board);
+        return boardDto;
+    }
+
 }

@@ -33,5 +33,13 @@ public class BoardController {
         return ResponseEntity.ok(boardService.getBoards());
     }
 
+    // 개별 게시글 조회
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/boards/{id}")
+    public ResponseEntity getBoard(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(boardService.getBoard(id));
+    }
+
+
 
 }
