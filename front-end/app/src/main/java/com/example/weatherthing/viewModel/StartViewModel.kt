@@ -1,6 +1,7 @@
 package com.example.weatherthing.viewModel
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherthing.data.User
@@ -74,7 +75,8 @@ class StartViewModel : ViewModel() {
     fun checkAfterGoogleLogin() { // 구글 로그인 완료 후
         // sharedPreference에 저장된 데이터가 있으면 가입된 유저라고 간주
         loginState.value = if (prefUser != null) {
-            LoginState.CompleteLogin
+            Log.d("유저", prefUser.toString())
+            LoginState.RequireRegister
         } else {
             // val user : User? = db get
 //                                if(user != null){
