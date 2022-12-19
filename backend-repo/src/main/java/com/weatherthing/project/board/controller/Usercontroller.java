@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     private final UserService userService;
 
-
+    // 회원정보 DB에 저장
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/auth")
     public ResponseEntity register(@RequestBody RegisterDto registerDto) {
