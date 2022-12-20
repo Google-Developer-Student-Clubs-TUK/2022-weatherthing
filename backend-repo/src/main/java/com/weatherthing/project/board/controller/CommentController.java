@@ -23,11 +23,18 @@ public class CommentController {
 
     // 댓글 작성
     @ResponseStatus(HttpStatus.OK)
-    @PostMapping("/comments")
+    @PostMapping("/boards/comments")
     public ResponseEntity writeComment(@RequestBody CommentDto commentDto) {
         User user = userRepository.findById(commentDto.getUid()).get();
         Board board = boardRepository.findById(commentDto.getBoardid()).get();
         return ResponseEntity.ok(commentService.writeComment(board.getId(), commentDto, user));
+    }
+
+    // 게시글에 달린 댓글 불러오기
+    @ResponseStatus(HttpStatus.OK)
+    @GetMapping("/boards/comments/{boardid}")
+    public ResponseEntity getComments(@PathVariable(required = false) Long boardid) {
+        return ResponseEntity.ok(commentService.getComments(boardid));
     }
 
 }

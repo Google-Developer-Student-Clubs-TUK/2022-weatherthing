@@ -10,6 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -33,4 +36,14 @@ public class CommentService {
 
         return CommentDto.toDto(comment);
     }
+    // 글에 해당하는 전체 댓글 불러오기
+    @Transactional(readOnly = true)
+    public List<CommentDto> getComments(Long boardId) {
+        List<Comment> comments = commentRepository.findAllByBoardId(boardId);
+        List<CommentDto> commentDtos = new ArrayList<>();
+        comments.forEach(s -> commentDtos.add(CommentDto.toDto(s)));
+        return commentDtos;
+    }
+
+
 }
