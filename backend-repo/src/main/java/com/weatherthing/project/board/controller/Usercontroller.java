@@ -16,7 +16,7 @@ public class UserController {
 
     // 회원정보 DB에 저장
     @ResponseStatus(HttpStatus.CREATED)
-    @PostMapping("/auth")
+    @PostMapping("/users")
     public ResponseEntity register(@RequestBody RegisterDto registerDto) {
         return ResponseEntity.ok(userService.register(registerDto));
     }
