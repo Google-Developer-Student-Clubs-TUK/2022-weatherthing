@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -46,6 +47,13 @@ fun SignUpScreen(
     navController: NavHostController,
     weatherCode: Int
 ) {
+    val colorList = listOf(
+        listOf(Color(0xFFFF7167), Color(0xFFEEB685)),
+        listOf(Color(0xFF4180E0), Color(0xFF7DD2BC)),
+        listOf(Color(0xFF76AAF5), Color(0xFFF3F3F3)),
+        listOf(Color(0xFF091525), Color(0xFFF5B534))
+    )
+
     val weatherList: List<String> = listOf<String>("맑음", "비", "눈", "천둥번개")
     val (nickname, setNickname) = remember {
         mutableStateOf("")
@@ -73,7 +81,13 @@ fun SignUpScreen(
             imgUri = uri
         }
 
-    Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
+    Column(
+        modifier = Modifier.fillMaxSize().background(
+            brush = Brush.verticalGradient(
+                colors = colorList[weatherCode]
+            )
+        )
+    ) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
             IconButton(modifier = Modifier.weight(1f), onClick = { navController.popBackStack() }) {
                 Icon(
@@ -123,10 +137,11 @@ fun SignUpScreen(
                     .size(106.dp),
                 contentAlignment = Alignment.Center
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.add_img_round),
                     contentDescription = "이미지 추가",
-                    modifier = Modifier.size(106.dp)
+                    modifier = Modifier.size(106.dp),
+                    tint = Color.White
                 )
                 Box(
                     modifier = Modifier
@@ -160,10 +175,11 @@ fun SignUpScreen(
                                 .padding(end = 5.dp)
                         )
                     } else {
-                        Image(
+                        Icon(
                             painter = painterResource(id = R.drawable.add_img_round),
                             contentDescription = "이미지 추가",
-                            modifier = Modifier.size(100.dp)
+                            modifier = Modifier.size(100.dp),
+                                    tint = Color.White
                         )
                     }
                     Image(

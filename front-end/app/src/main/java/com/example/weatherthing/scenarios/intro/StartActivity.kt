@@ -197,7 +197,7 @@ sealed class StartScreen(val title: String, val route: String) {
 }
 
 @Composable
-fun Screen(startRoute: String, navController: NavHostController, modifier: Modifier = Modifier, startViewModel: StartViewModel) {
+fun Screen(startRoute: String, navController: NavHostController, startViewModel: StartViewModel) {
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute) {
         composable(
@@ -209,7 +209,7 @@ fun Screen(startRoute: String, navController: NavHostController, modifier: Modif
             SignUpScreen(
                 viewModel = startViewModel,
                 navController = navController,
-                weatherCode = it.arguments?.getInt("weatherCode") ?: 0,
+                weatherCode = it.arguments?.getInt("weatherCode") ?: 0
             )
         }
         composable(StartScreen.WeatherSel.route) {

@@ -24,10 +24,10 @@ val imageMap: MutableMap<String, String> = mapOf(
 ) as MutableMap<String, String>
 
 fun weatherPagerContent() = listOf(
-    WeatherPagerContent("맑음", "https://assets3.lottiefiles.com/datafiles/ugFV3T9Zi676bvx/data.json", "️☀️"),
-    WeatherPagerContent("비", "https://assets8.lottiefiles.com/packages/lf20_oAByvh2C1K.json", "🌧"),
-    WeatherPagerContent("눈", "https://assets3.lottiefiles.com/temp/lf20_WtPCZs.json", "❄️"),
-    WeatherPagerContent("천둥번개", "https://assets2.lottiefiles.com/temp/lf20_Kuot2e.json", "⚡️")
+    WeatherPagerContent("Sunny", "https://assets3.lottiefiles.com/datafiles/ugFV3T9Zi676bvx/data.json", "️☀️"),
+    WeatherPagerContent("Rain", "https://assets8.lottiefiles.com/packages/lf20_oAByvh2C1K.json", "🌧"),
+    WeatherPagerContent("Snow", "https://assets3.lottiefiles.com/temp/lf20_WtPCZs.json", "❄️"),
+    WeatherPagerContent("Thunder", "https://assets2.lottiefiles.com/temp/lf20_Kuot2e.json", "⚡️")
 )
 
 fun getWeatherAnimationUrl(key: String?): String {
