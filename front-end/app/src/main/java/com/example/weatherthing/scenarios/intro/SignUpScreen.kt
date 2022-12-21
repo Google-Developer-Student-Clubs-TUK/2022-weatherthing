@@ -13,6 +13,8 @@ import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
@@ -40,7 +42,7 @@ import com.example.weatherthing.viewModel.StartViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SignUpScreen(
-    viewModel: StartViewModel = androidx.lifecycle.viewmodel.compose.viewModel(),
+    viewModel: StartViewModel,
     navController: NavHostController,
     weatherCode: Int
 ) {
@@ -73,7 +75,7 @@ fun SignUpScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
         Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-            IconButton(modifier = Modifier.weight(1f),onClick = { navController.popBackStack() }) {
+            IconButton(modifier = Modifier.weight(1f), onClick = { navController.popBackStack() }) {
                 Icon(
                     imageVector = Icons.Filled.ArrowBackIosNew,
                     contentDescription = "뒤로가기",
@@ -87,15 +89,35 @@ fun SignUpScreen(
                 modifier = Modifier.weight(6f),
                 textAlign = TextAlign.Center
             )
-            Box(modifier = Modifier.weight(1f)) {
+            IconButton(modifier = Modifier.weight(1f), onClick = {
+                if (nickname != "" && imgUri != null) {
+                    viewModel.sign(
+                        nickname,
+                        selectedAge,
+                        gender = genderKey ?: 0,
+                        weatherCode,
+                        imgUri!!
+                    )
+                } else if (nickname == "") {
+                    Toast.makeText(App.context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(App.context, "사진을 추가해주세요", Toast.LENGTH_SHORT).show()
+                }
+            }) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = "뒤로가기",
+                    modifier = Modifier.size(15.dp),
+                    tint = Color.Black
+                )
             }
         }
         Column(
-            modifier = Modifier.fillMaxSize().padding(18.dp),
+            modifier = Modifier.fillMaxSize().padding(horizontal = 18.dp, vertical = 20.dp),
             verticalArrangement = Arrangement.SpaceBetween,
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.size(20.dp))
+            Spacer(modifier = Modifier.size(15.dp))
             Box(
                 modifier = Modifier
                     .size(106.dp),
@@ -166,7 +188,6 @@ fun SignUpScreen(
                         .height(50.dp).padding(0.dp).fillMaxWidth(),
                     shape = MaterialTheme.shapes.large.copy(CornerSize(20.dp)),
                     placeholder = {
-
                         Text(
                             text = "nickname",
                             style = TextStyle(
@@ -246,6 +267,13 @@ fun SignUpScreen(
                 TextField(
                     readOnly = true,
                     value = gender,
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    },
                     onValueChange = { },
                     modifier = Modifier.padding(0.dp)
                         .height(50.dp).padding(0.dp).fillMaxWidth(),
@@ -305,6 +333,13 @@ fun SignUpScreen(
                     shape = MaterialTheme.shapes.large.copy(CornerSize(20.dp)),
                     maxLines = 1,
                     visualTransformation = VisualTransformation.None,
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowDropDown,
+                            contentDescription = "",
+                            modifier = Modifier.size(25.dp)
+                        )
+                    },
                     colors = TextFieldDefaults.textFieldColors(
                         textColor = Color.DarkGray,
                         disabledTextColor = Color.Transparent,
@@ -335,23 +370,7 @@ fun SignUpScreen(
                     }
                 }
             }
-            Button(onClick = {
-                if (nickname != "" && imgUri != null) {
-                    viewModel.sign(
-                        nickname,
-                        selectedAge,
-                        gender = genderKey ?: 0,
-                        weatherCode,
-                        imgUri
-                    )
-                } else if (nickname == "") {
-                    Toast.makeText(App.context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(App.context, "사진을 추가해주세요", Toast.LENGTH_SHORT).show()
-                }
-            }) {
-                Text(text = "가입하기")
-            }
+            Spacer(modifier = Modifier.size(10.dp))
         }
     }
 }

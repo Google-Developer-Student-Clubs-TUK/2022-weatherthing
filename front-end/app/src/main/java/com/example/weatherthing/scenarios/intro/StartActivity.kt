@@ -1,6 +1,8 @@
 package com.example.weatherthing.scenarios.intro
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -21,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -30,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.weatherthing.R
 import com.example.weatherthing.scenarios.main.MainActivity
+import com.example.weatherthing.utils.getRegionCode
 import com.example.weatherthing.viewModel.LoginState
 import com.example.weatherthing.viewModel.StartViewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -37,12 +41,14 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 
 class StartActivity : ComponentActivity() {
     private val viewModel by viewModels<StartViewModel>()
     private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val RC_SIGN_IN = 1313
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,9 +75,10 @@ class StartActivity : ComponentActivity() {
                         }
                     }
                     LoginState.RequireRegister -> {
+                        getCurrentLocation()
                         setContent {
                             val navController = rememberNavController()
-                            Screen(startRoute = "Weather", navController = navController)
+                            Screen(startRoute = "Weather", navController = navController, startViewModel = viewModel)
                         }
                     }
                     LoginState.CompleteLogin -> {
@@ -81,6 +88,7 @@ class StartActivity : ComponentActivity() {
             }
         }
     }
+
     private fun toMainActivity() {
         startActivity(Intent(this, MainActivity::class.java))
     }
@@ -103,6 +111,7 @@ class StartActivity : ComponentActivity() {
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
@@ -131,6 +140,55 @@ class StartActivity : ComponentActivity() {
             }
         }
     }
+
+    private fun getCurrentLocation() {
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
+        permissionCheck()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        val fLocationPermission =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        val cLocationPermission =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (requestCode == 200) {
+            if (fLocationPermission == PackageManager.PERMISSION_GRANTED && cLocationPermission == PackageManager.PERMISSION_GRANTED) {
+                getCurrentLocation()
+            } else Toast.makeText(
+                this,
+                "앱을 실행하기 위해서 위치 권한이 필요합니다. 위치 권한을 설정해주세요.",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+
+    private fun permissionCheck() {
+        val fLocationPermission =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        val cLocationPermission =
+            ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+
+        if (fLocationPermission == PackageManager.PERMISSION_GRANTED && cLocationPermission == PackageManager.PERMISSION_GRANTED
+        ) {
+            fusedLocationClient.lastLocation.addOnSuccessListener {
+                val code = getRegionCode(it)
+                viewModel.regionCode = code
+            }
+        } else {
+            val permissions = arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+            ActivityCompat.requestPermissions(this, permissions, 200)
+        }
+    }
 }
 
 sealed class StartScreen(val title: String, val route: String) {
@@ -139,7 +197,7 @@ sealed class StartScreen(val title: String, val route: String) {
 }
 
 @Composable
-fun Screen(startRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
+fun Screen(startRoute: String, navController: NavHostController, modifier: Modifier = Modifier, startViewModel: StartViewModel) {
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute) {
         composable(
@@ -148,10 +206,14 @@ fun Screen(startRoute: String, navController: NavHostController, modifier: Modif
                 navArgument("weatherCode") { type = NavType.IntType }
             )
         ) {
-            SignUpScreen(navController = navController, weatherCode = it.arguments?.getInt("weatherCode")?:0)
+            SignUpScreen(
+                viewModel = startViewModel,
+                navController = navController,
+                weatherCode = it.arguments?.getInt("weatherCode") ?: 0,
+            )
         }
         composable(StartScreen.WeatherSel.route) {
-            WeatherSelectScreen(navController)
+            WeatherSelectScreen(navController, startViewModel)
         }
     }
 }

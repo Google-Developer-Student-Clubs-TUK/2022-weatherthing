@@ -20,7 +20,7 @@ import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 
 @Composable
-fun WeatherSelectScreen(navController: NavHostController, viewModel: StartViewModel = androidx.lifecycle.viewmodel.compose.viewModel()) {
+fun WeatherSelectScreen(navController: NavHostController, viewModel: StartViewModel) {
     Box(modifier = Modifier.fillMaxSize().padding(20.dp), contentAlignment = Alignment.Center) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(

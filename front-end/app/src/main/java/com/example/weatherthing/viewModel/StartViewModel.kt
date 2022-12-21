@@ -1,6 +1,8 @@
 package com.example.weatherthing.viewModel
 
 import android.content.Context
+import android.location.Location
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -29,21 +31,22 @@ sealed class LoginState {
 class StartViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     val loginState = MutableStateFlow<LoginState>(LoginState.Loading)
-    val pref = AppPref(App.context)
-    val prefUser = pref.getUserPref()
+    private val pref = AppPref(App.context)
+    private val prefUser = pref.getUserPref()
+    var regionCode = 0
 
     init {
         viewModelScope.launch {
             kotlin.runCatching {
                 val list = listOf(
                     async {
-                        delay(3000)
+                        delay(2500)
                         LoginState.Loading
                     },
                     async {
                         if (getLastSignedInAccount(App.context)) {
                             if (prefUser != null) {
-                                LoginState.CompleteLogin
+                                LoginState.RequireRegister
                             } else {
                                 // val user : User? = db get
 //                                if(user != null){
@@ -64,9 +67,9 @@ class StartViewModel : ViewModel() {
         }
     }
 
-    fun sign(nickname: String, age: Int, gender: Int, weather: Int) {
+    fun sign(nickname: String, age: Int, gender: Int, weather: Int, imgUri: Uri) {
         auth.currentUser?.let {
-            val user = User(it.uid, it.email ?: "", nickname, gender, age, weather)
+            val user = User(it.uid, it.email ?: "", nickname, gender, age, weather, regionCode)
             pref.setUserPref(user)
             loginState.value = LoginState.CompleteLogin
         }
