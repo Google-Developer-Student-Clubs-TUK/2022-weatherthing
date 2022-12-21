@@ -6,5 +6,6 @@ data class User(
     val nickname: String,
     val gender: Int,
     val age: Int,
-    val weather: Int
+    val weather: Int,
+    val regionCode: Int
 )

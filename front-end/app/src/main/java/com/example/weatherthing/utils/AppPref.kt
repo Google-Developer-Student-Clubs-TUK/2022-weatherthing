@@ -11,7 +11,15 @@ class AppPref(context: Context) {
     fun getUserPref(): User? {
         val uId = getString("uId")
         return if (uId != null) {
-            User(uId = uId, nickname = getString("nickname") ?: "", email = getString("email") ?: "", age = getInt("age"), gender = getInt("gender"), weather = getInt("weather"))
+            User(
+                uId = uId,
+                nickname = getString("nickname") ?: "",
+                email = getString("email") ?: "",
+                age = getInt("age"),
+                gender = getInt("gender"),
+                weather = getInt("weather"),
+                regionCode = getInt("regionCode"),
+            )
         } else {
             null
         }
@@ -29,9 +37,11 @@ class AppPref(context: Context) {
     private fun setString(key: String, value: String) {
         prefs.edit().putString(key, value).apply()
     }
+
     private fun setInt(key: String, value: Int) {
         prefs.edit().putInt(key, value).apply()
     }
+
     fun setBoolean(key: String, value: Boolean) {
         prefs.edit().putBoolean(key, value).apply()
     }
