@@ -33,6 +33,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.weatherthing.scenarios.Home
+import com.example.weatherthing.scenarios.main.Post.CommentScreen
+import com.example.weatherthing.scenarios.main.Post.PostScreen
 import com.example.weatherthing.scenarios.main.chat.ChatListScreen
 import com.example.weatherthing.viewModel.MainViewModel
 import com.google.android.gms.common.api.ApiException
@@ -48,6 +50,11 @@ sealed class BottomNavItem(val title: String, val icon: ImageVector, val route: 
     object UserScreen : BottomNavItem("매칭 유저", Icons.Filled.Person, "SEARCH")
     object ChatListScreen : BottomNavItem("채팅목록", Icons.Filled.MailOutline, "SHORTVIDEO")
     object MyPageScreen : BottomNavItem("마이페이지", Icons.Filled.Person, "MYPAGE")
+}
+
+enum class NavItem(val routeName: String, val description: String) {
+    POST("POST", "게시물 작성 페이지"),
+    COMMENT("COMMENT", "댓글 작성 페이지")
 }
 
 class MainActivity : ComponentActivity(), LocationListener {
@@ -230,6 +237,16 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String, navController: NavH
             ChatListScreen(navController = navController)
         }
         composable(BottomNavItem.UserScreen.route) {
+        }
+        composable(
+            NavItem.POST.routeName
+        ){
+            PostScreen(navController = navController)
+        }
+        composable(
+            NavItem.COMMENT.routeName
+        ){
+            CommentScreen(navController = navController)
         }
     }
 }
