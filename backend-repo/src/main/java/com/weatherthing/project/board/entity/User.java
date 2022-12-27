@@ -11,7 +11,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "Users")
+@Table(name = "USERS")
 public class User extends BaseTimeEntity{
 
 //    @Id
@@ -31,8 +31,8 @@ public class User extends BaseTimeEntity{
     @Column(nullable = false)
     private Integer age;
 
-    @Column(nullable = false, name = "eco_score")
-    private Integer ecoScore;
+//    @Column(nullable = false, name = "eco_score")
+//    private Integer ecoScore;
 
     @Column(nullable = false, name = "gender_code")
     private Integer genderCode;
