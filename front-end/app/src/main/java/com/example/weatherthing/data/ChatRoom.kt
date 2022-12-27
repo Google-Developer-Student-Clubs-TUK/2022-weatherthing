@@ -11,7 +11,7 @@ data class ChatRoom(
 )
 
 data class ChatUser(
-    val id: String,
+    val id: Int,
     var nickname: String
 )
 
@@ -26,7 +26,7 @@ fun fbSnapshotToChatroom(snapshot: DataSnapshot): ChatRoom? {
         if (_chats.isNotEmpty()) {
             _chats.forEach { chat ->
                 chats += Chat(
-                    from = chat["from"] as String,
+                    from = (chat["from"] as Long).toInt(),
                     contents = chat["contents"] as String,
                     createdAt = chat["createdAt"] as String
                 )
@@ -35,8 +35,8 @@ fun fbSnapshotToChatroom(snapshot: DataSnapshot): ChatRoom? {
         return ChatRoom(
             result["id"] as String,
             result["createdAt"] as String,
-            ChatUser(userA?.get("id") as String, userA["nickname"] as String),
-            ChatUser(userB?.get("id") as String, userA["nickname"] as String),
+            ChatUser((userA?.get("id") as Long).toInt(), userA["nickname"] as String),
+            ChatUser((userB?.get("id") as Long).toInt(), userA["nickname"] as String),
             chats.toList()
         )
     }

@@ -32,7 +32,7 @@ class ChatViewModel : ViewModel() {
     var user = AppPref(App.context).getUserPref()
 
     init {
-        firebaseDB.reference.child("user").child(user!!.uId).get()
+        firebaseDB.reference.child("user").child(user!!.uid).get()
             .addOnSuccessListener {
                 it.value?.let { it ->
                     chatRoomList.value = it as List<String>
@@ -71,9 +71,9 @@ class ChatViewModel : ViewModel() {
         data?.forEach {
             _chats.add(
                 Chat(
+                    (it["from"] as Long).toInt(),
                     it["contents"] as String,
                     it["createdAt"] as String,
-                    it["from"] as String
                 )
             )
         }
@@ -120,8 +120,8 @@ class ChatViewModel : ViewModel() {
         ).format(Date(System.currentTimeMillis()))
         viewModelScope.launch {
             if (chatId !in chatRoomList.value) {
-                val notMe = ChatUser("", "")
-                val me = ChatUser(user!!.uId, user!!.nickname)
+                val notMe = ChatUser(0, "")
+                val me = ChatUser(user!!.id!!, user!!.nickname)
                 val chatroomData = ChatRoom(chatId, timeStamp, notMe, me, chat)
 
                 fbSetValue(firebaseDB.reference.child("chat").child(chatId), chatroomData) { enterChatRoom(chatId) }
@@ -129,7 +129,7 @@ class ChatViewModel : ViewModel() {
                 chatRoomList.value += chatId
                 Log.d("유저 채팅 리스트", chatRoomList.value.toString())
 
-                fbSetValue(firebaseDB.reference.child("user").child(user!!.uId), chatRoomList.value) { enterChatRoom(chatId) }
+                fbSetValue(firebaseDB.reference.child("user").child(user!!.uid), chatRoomList.value) { enterChatRoom(chatId) }
             }
         }
     }

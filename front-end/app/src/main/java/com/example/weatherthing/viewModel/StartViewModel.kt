@@ -59,7 +59,16 @@ class StartViewModel : ViewModel() {
 
     fun sign(nickname: String, age: Int, gender: Int, weather: Int, imgUri: Uri) {
         auth.currentUser?.let {
-            val user = User(it.uid, it.email ?: "", nickname, gender, age, weather, regionCode)
+            val user = User(
+                id = null,
+                uid = it.uid,
+                email = it.email ?: "",
+                nickname = nickname,
+                genderCode = gender,
+                age = age,
+                weatherCode = weather,
+                regionCode = regionCode
+            )
             viewModelScope.launch {
                 val result = dbRepository.joinUser(user)
                 if (result is Load.Success<*>) {
@@ -98,6 +107,7 @@ class StartViewModel : ViewModel() {
         // 닉네임 중복 아니면 true
         return true
     }
+
     // 이전에 로그인 한 계정이 있는지 확인
     private fun getLastSignedInAccount(context: Context) =
         GoogleSignIn.getLastSignedInAccount(context) != null

@@ -9,29 +9,31 @@ class AppPref(context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences(prefFilename, 0)
 
     fun getUserPref(): User? {
-        val uId = getString("uId")
-        return if (uId != null) {
+        val id = getInt("id")
+        return if (id == -99) {
+            null
+        } else {
             User(
-                uId = uId,
+                id = getInt("id"),
+                uid = getString("uid") ?: "",
                 nickname = getString("nickname") ?: "",
                 email = getString("email") ?: "",
                 age = getInt("age"),
-                gender = getInt("gender"),
-                weather = getInt("weather"),
-                regionCode = getInt("regionCode"),
+                genderCode = getInt("gender"),
+                weatherCode = getInt("weather"),
+                regionCode = getInt("regionCode")
             )
-        } else {
-            null
         }
     }
 
     fun setUserPref(user: User) {
-        setString("uId", user.uId)
+        setInt("id", user.id!!)
+        setString("uId", user.uid)
         setString("email", user.email)
         setString("nickname", user.nickname)
         setInt("age", user.age)
-        setInt("gender", user.gender)
-        setInt("weather", user.weather)
+        setInt("gender", user.genderCode)
+        setInt("weather", user.weatherCode)
     }
 
     private fun setString(key: String, value: String) {
@@ -46,9 +48,9 @@ class AppPref(context: Context) {
         prefs.edit().putBoolean(key, value).apply()
     }
 
-    private fun getString(key: String): String? = prefs.getString(key, "")
+    private fun getString(key: String): String? = prefs.getString(key, null)
 
-    private fun getInt(key: String): Int = prefs.getInt(key, 0)
+    private fun getInt(key: String): Int = prefs.getInt(key, -99)
 
     private fun getBoolean(key: String): Boolean =
         prefs.getBoolean(key, false)

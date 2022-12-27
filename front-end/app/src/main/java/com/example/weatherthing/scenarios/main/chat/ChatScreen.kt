@@ -65,7 +65,7 @@ fun ChatScreen(navController: NavHostController, chatViewModel: ChatViewModel = 
                 verticalArrangement = Arrangement.Bottom
             ) {
                 ChatSection(chatViewModel.chats.collectAsState(), chatViewModel.chatRoom.collectAsState(), user, Modifier.weight(1f), navController)
-                SendSection(chatViewModel, chatId, user.uId)
+                SendSection(chatViewModel, chatId, user.id!!)
             }
         }
     }
@@ -84,7 +84,7 @@ fun ChatScreen(navController: NavHostController, chatViewModel: ChatViewModel = 
 
 @Composable
 fun ChatSection(message: State<List<Chat>?>, chatData: State<ChatRoom?>, user: User, modifier: Modifier = Modifier, navController: NavHostController) {
-    val otherNickname = if (chatData.value?.userA?.id == user.uId) {
+    val otherNickname = if (chatData.value?.userA?.id == user.id) {
         user.nickname
     } else {
         chatData.value?.userB?.nickname ?: ""
@@ -97,7 +97,7 @@ fun ChatSection(message: State<List<Chat>?>, chatData: State<ChatRoom?>, user: U
     ) {
         message.value?.let {
             items(it) { message ->
-                ChatItem(message, otherNickname, user.uId, navController)
+                ChatItem(message, otherNickname, user.id!!, navController)
 
                 Spacer(modifier = Modifier.height(13.dp))
             }
@@ -106,14 +106,14 @@ fun ChatSection(message: State<List<Chat>?>, chatData: State<ChatRoom?>, user: U
 }
 
 @Composable
-fun ChatItem(chat: Chat, nickname: String, uid: String, navController: NavHostController) {
+fun ChatItem(chat: Chat, nickname: String, id: Int, navController: NavHostController) {
     val current = System.currentTimeMillis()
 
 //    val calculateTime = CalculateTime()
 //    val time = calculateTime.calTimeToChat(current, chat.createdAt)
 
     // 본인일때 true
-    val isMe = chat.from == uid
+    val isMe = chat.from == id
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = if (!isMe) Arrangement.Start else Arrangement.End,
@@ -168,7 +168,7 @@ fun ChatItem(chat: Chat, nickname: String, uid: String, navController: NavHostCo
 }
 
 @Composable
-fun SendSection(viewModel: ChatViewModel, chatId: String, userId: String) {
+fun SendSection(viewModel: ChatViewModel, chatId: String, userId: Int) {
     val sendMessage = remember {
         mutableStateOf("")
     }

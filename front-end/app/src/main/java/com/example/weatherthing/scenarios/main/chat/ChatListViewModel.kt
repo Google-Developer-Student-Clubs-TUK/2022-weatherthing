@@ -8,11 +8,7 @@ import com.example.weatherthing.data.ChatRoom
 import com.example.weatherthing.data.fbSnapshotToChatroom
 import com.example.weatherthing.utils.App
 import com.example.weatherthing.utils.AppPref
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.*
@@ -27,7 +23,7 @@ class ChatListViewModel : ViewModel() {
     init {
         fbChatListener(
             viewModelScope,
-            firebaseDB.reference.child("user").child(user.uId)
+            firebaseDB.reference.child("user").child(user.uid)
         ) {
             getChatData(it)
         }

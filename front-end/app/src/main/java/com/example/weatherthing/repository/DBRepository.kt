@@ -1,5 +1,6 @@
 package com.example.weatherthing.repository
 
+import android.util.Log
 import com.example.weatherthing.data.User
 import com.example.weatherthing.data.UserDBResponse
 import com.example.weatherthing.di.NetworkModule
@@ -8,7 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.http.*
 
 object DBRepository {
-    val BASE_URL: String = ""
+    val BASE_URL: String = "http://10.0.2.2:8080"
 
     suspend fun getProfile(uId: String): Load =
         kotlin.runCatching {
@@ -18,12 +19,13 @@ object DBRepository {
         }.getOrNull()?.let {
             Load.Success(
                 User(
-                    it.uId,
+                    it.id,
+                    it.uid,
                     it.email,
                     it.nickname,
-                    it.gender,
+                    it.genderCode,
                     it.age,
-                    it.weather,
+                    it.weatherCode,
                     it.regionCode
                 )
             )
