@@ -13,7 +13,7 @@ public class RegisterDto {
     private String email;
     private String nickname;
     private Integer age;
-    private Integer ecoScore;
+//    private Integer ecoScore;
     private Integer genderScore;
     private Integer weatherCode;
     private Integer regionCode;
