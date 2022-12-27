@@ -14,7 +14,7 @@ public class RegisterDto {
     private String nickname;
     private Integer age;
 //    private Integer ecoScore;
-    private Integer genderScore;
+    private Integer genderCode;
     private Integer weatherCode;
     private Integer regionCode;
 }

@@ -19,7 +19,7 @@ public class UserService {
         user.setNickname(registerDto.getNickname());
         user.setAge(registerDto.getAge());
 //        user.setEcoScore(registerDto.getEcoScore());
-        user.setGenderCode(registerDto.getGenderScore());
+        user.setGenderCode(registerDto.getGenderCode());
         user.setWeatherCode(registerDto.getWeatherCode());
         user.setRegionCode(registerDto.getRegionCode());
         return userRepository.save(user);
