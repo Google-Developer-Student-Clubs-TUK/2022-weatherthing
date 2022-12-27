@@ -5,10 +5,7 @@ import io.ktor.client.features.json.*
 import io.ktor.client.features.json.serializer.*
 import com.example.weatherthing.BuildConfig
 
-object DataModule {
-    const val API_KEY = BuildConfig.OPENWEATHER_API_KEY
-    const val URL = "https://api.openweathermap.org"
-
+object NetworkModule {
     val client = HttpClient() {
         install(JsonFeature) {
             serializer = KotlinxSerializer(

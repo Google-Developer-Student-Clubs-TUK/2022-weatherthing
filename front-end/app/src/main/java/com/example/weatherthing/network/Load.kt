@@ -1,7 +1,7 @@
 package com.example.weatherthing.network
 
-sealed class Load<out T : Any> {
-    object Loading : Load<Nothing>()
-    data class Success<out T : Any>(val data: T) : Load<T>()
-    data class Error(val errMsg: String) : Load<Nothing>()
+sealed class Load {
+    object Loading : Load()
+    data class Success<T>(val data: T) : Load()
+    data class Fail(val errMsg: String) : Load()
 }

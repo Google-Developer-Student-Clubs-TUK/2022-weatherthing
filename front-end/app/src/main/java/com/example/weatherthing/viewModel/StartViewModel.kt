@@ -1,12 +1,12 @@
 package com.example.weatherthing.viewModel
 
 import android.content.Context
-import android.location.Location
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherthing.data.User
+import com.example.weatherthing.network.Load
+import com.example.weatherthing.repository.DBRepository
 import com.example.weatherthing.utils.App
 import com.example.weatherthing.utils.AppPref
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -30,9 +30,10 @@ sealed class LoginState {
 
 class StartViewModel : ViewModel() {
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
+    private val dbRepository = DBRepository
     val loginState = MutableStateFlow<LoginState>(LoginState.Loading)
+
     private val pref = AppPref(App.context)
-    private val prefUser = pref.getUserPref()
     var regionCode = 0
 
     init {
@@ -45,18 +46,7 @@ class StartViewModel : ViewModel() {
                     },
                     async {
                         if (getLastSignedInAccount(App.context)) {
-                            if (prefUser != null) {
-                                LoginState.RequireRegister
-                            } else {
-                                // val user : User? = db get
-//                                if(user != null){
-//                                    pref.setUserPref(user)
-//                                    LoginState.CompleteLogin
-//                                }else{
-//                                    LoginState.RequireRegister
-//                                }
-                                LoginState.RequireRegister
-                            }
+                            checkAfterLogin()
                         } else {
                             LoginState.RequireLogin
                         }
@@ -70,25 +60,37 @@ class StartViewModel : ViewModel() {
     fun sign(nickname: String, age: Int, gender: Int, weather: Int, imgUri: Uri) {
         auth.currentUser?.let {
             val user = User(it.uid, it.email ?: "", nickname, gender, age, weather, regionCode)
-            pref.setUserPref(user)
-            loginState.value = LoginState.CompleteLogin
+            viewModelScope.launch {
+                val result = dbRepository.joinUser(user)
+                if (result is Load.Success<*>) {
+                    pref.setUserPref(user)
+                    loginState.emit(LoginState.CompleteLogin)
+                }
+            }
         }
     }
 
-    fun checkAfterGoogleLogin() { // 구글 로그인 완료 후
+    fun login() {
+        viewModelScope.launch {
+            loginState.value = checkAfterLogin()
+        }
+    }
+
+    private suspend fun checkAfterLogin(): LoginState { // 구글 로그인 완료 후
         // sharedPreference에 저장된 데이터가 있으면 가입된 유저라고 간주
-        loginState.value = if (prefUser != null) {
-            Log.d("유저", prefUser.toString())
-            LoginState.RequireRegister
+        val prefUser = pref.getUserPref()
+        return if (prefUser != null) {
+            LoginState.CompleteLogin
         } else {
-            // val user : User? = db get
-//                                if(user != null){
-//                                    pref.setUserPref(user)
-//                                    LoginState.CompleteLogin
-//                                }else{
-//                                    LoginState.RequireRegister
-//                                }
-            LoginState.RequireRegister
+            auth.currentUser?.let {
+                val result = dbRepository.getProfile(uId = it.uid)
+                if (result is Load.Success<*>) {
+                    pref.setUserPref(result.data as User)
+                    LoginState.CompleteLogin
+                } else {
+                    LoginState.RequireRegister
+                }
+            } ?: LoginState.RequireLogin
         }
     }
 
@@ -96,12 +98,6 @@ class StartViewModel : ViewModel() {
         // 닉네임 중복 아니면 true
         return true
     }
-
-    fun joinAccount(nickname: String) {
-        auth.currentUser?.let {
-        }
-    }
-
     // 이전에 로그인 한 계정이 있는지 확인
     private fun getLastSignedInAccount(context: Context) =
         GoogleSignIn.getLastSignedInAccount(context) != null

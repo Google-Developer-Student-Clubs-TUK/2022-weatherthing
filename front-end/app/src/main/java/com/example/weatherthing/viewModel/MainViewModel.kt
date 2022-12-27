@@ -3,7 +3,7 @@ package com.example.weatherthing.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherthing.data.WeatherData
-import com.example.weatherthing.repository.Repository
+import com.example.weatherthing.repository.WeatherRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -17,7 +17,7 @@ class MainViewModel : ViewModel() {
             _weather.value = WeatherState.Loading
 
             _weather.value = kotlin.runCatching {
-                Repository.getWeather(latitude, longitude)
+                WeatherRepository.getWeather(latitude, longitude)
             }.mapCatching {
                 WeatherState.Loaded(it)
             }.getOrElse {

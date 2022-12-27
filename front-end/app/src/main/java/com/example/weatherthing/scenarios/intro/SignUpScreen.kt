@@ -4,9 +4,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
@@ -80,9 +78,9 @@ fun SignUpScreen(
         rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
             imgUri = uri
         }
-
+    val context = LocalContext.current
     Column(
-        modifier = Modifier.fillMaxSize().background(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).background(
             brush = Brush.verticalGradient(
                 colors = colorList[weatherCode]
             )
@@ -94,14 +92,16 @@ fun SignUpScreen(
                     imageVector = Icons.Filled.ArrowBackIosNew,
                     contentDescription = "뒤로가기",
                     modifier = Modifier.size(15.dp),
-                    tint = Color.Black
+                    tint = if (weatherCode == 2)Color.Black else Color.White
                 )
             }
             Text(
                 text = "Profile",
                 fontSize = 15.sp,
                 modifier = Modifier.weight(6f),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                color = if (weatherCode == 2) Color.Black else Color.White
+
             )
             IconButton(modifier = Modifier.weight(1f), onClick = {
                 if (nickname != "" && imgUri != null) {
@@ -113,16 +113,16 @@ fun SignUpScreen(
                         imgUri!!
                     )
                 } else if (nickname == "") {
-                    Toast.makeText(App.context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "닉네임을 입력해주세요", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(App.context, "사진을 추가해주세요", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "사진을 추가해주세요", Toast.LENGTH_SHORT).show()
                 }
             }) {
                 Icon(
                     imageVector = Icons.Filled.Check,
                     contentDescription = "뒤로가기",
                     modifier = Modifier.size(15.dp),
-                    tint = Color.Black
+                    tint = if (weatherCode == 2)Color.Black else Color.White
                 )
             }
         }
@@ -179,7 +179,7 @@ fun SignUpScreen(
                             painter = painterResource(id = R.drawable.add_img_round),
                             contentDescription = "이미지 추가",
                             modifier = Modifier.size(100.dp),
-                                    tint = Color.White
+                            tint = Color.White
                         )
                     }
                     Image(

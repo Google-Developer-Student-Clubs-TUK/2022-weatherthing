@@ -33,6 +33,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.weatherthing.R
 import com.example.weatherthing.scenarios.main.MainActivity
+import com.example.weatherthing.utils.App
 import com.example.weatherthing.utils.getRegionCode
 import com.example.weatherthing.viewModel.LoginState
 import com.example.weatherthing.viewModel.StartViewModel
@@ -78,7 +79,11 @@ class StartActivity : ComponentActivity() {
                         getCurrentLocation()
                         setContent {
                             val navController = rememberNavController()
-                            Screen(startRoute = "Weather", navController = navController, startViewModel = viewModel)
+                            Screen(
+                                startRoute = "Weather",
+                                navController = navController,
+                                startViewModel = viewModel
+                            )
                         }
                     }
                     LoginState.CompleteLogin -> {
@@ -133,10 +138,10 @@ class StartActivity : ComponentActivity() {
         val credential = GoogleAuthProvider.getCredential(account?.idToken, null)
         val auth = FirebaseAuth.getInstance()
         auth.signInWithCredential(credential).addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                auth.currentUser?.let {
-                    viewModel.checkAfterGoogleLogin()
-                }
+            task.addOnFailureListener {
+                Toast.makeText(App.context, "로그인에 실패했습니다: $it", Toast.LENGTH_SHORT).show()
+            }.addOnSuccessListener {
+                viewModel.login()
             }
         }
     }
