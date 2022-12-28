@@ -1,5 +1,6 @@
 package com.example.weatherthing.scenarios
 
+import android.provider.ContactsContract.CommonDataKinds.Nickname
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -29,6 +31,7 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.rememberLottieAnimatable
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.example.weatherthing.R
+import com.example.weatherthing.data.PostData
 import com.example.weatherthing.data.WeatherData
 import com.example.weatherthing.scenarios.main.NavItem
 import com.example.weatherthing.ui.theme.skyblue
@@ -37,7 +40,7 @@ import com.example.weatherthing.viewModel.MainViewModel
 import com.example.weatherthing.viewModel.WeatherState
 
 @Composable
-fun Home(viewModel: MainViewModel, navController: NavHostController) {
+fun Home(viewModel: MainViewModel, navController: NavHostController, weatherCode: Int) {
     Scaffold() {
         Column(
             Modifier
@@ -55,7 +58,7 @@ fun Home(viewModel: MainViewModel, navController: NavHostController) {
                     }
                 }
                 is WeatherState.Loaded -> {
-                    ShowBoard(state.data, navController)
+                    ShowBoard(state.data, navController, weatherCode)
                 }
             }
         }
@@ -118,36 +121,51 @@ private fun ShowWeather(weatherData: WeatherData) {
 }
 
 @Composable
-private fun ShowBoard(weatherData: WeatherData, navController: NavHostController) {
+private fun ShowBoard(weatherData: WeatherData, navController: NavHostController, weatherCode: Int) {
     val contents = listOf(
-        "배고픈데 같이 야식 드실 분? \n치킨 먹고 싶어요 ㅎㅎ",
+        "치킨 먹고 싶은데 야식으로 같이 드실 분 계실까요?",
         "근처 맛집 추천해주세요 ㅎㅎ",
-        "볼링 좋아하시나요",
-        "썸녀 심리 상담해주실 분 ㅠㅠ",
-        "병원 잘하는 곳 아시나요?",
+        "다들 볼링 좋아하시나요?",
+        "썸남 심리 상담해주실 분 ㅠㅠ",
+        "정왕동 병원 잘하는 곳 아시나요? 목이 너무 아픈데",
         "저희 집 고양이 보시고 가세요",
-        "사기 조심하세요",
-        "배고프다",
-        "괜찮나요",
-        "배고픈데 같이 야식 드실 분?",
-        "근처 맛집 추천해주세요 ㅎㅎ",
-        "볼링 좋아하시나요",
-        "썸녀 심리 상담해주실 분 ㅠㅠ",
-        "병원 잘하는 곳 아시나요?",
-        "저희 집 고양이 보시고 가세요",
-        "사기 조심하세요",
-        "배고프다",
-        "괜찮나요",
-        "배고픈데 같이 야식 드실 분?",
-        "근처 맛집 추천해주세요 ㅎㅎ",
-        "볼링 좋아하시나요",
-        "썸녀 심리 상담해주실 분 ㅠㅠ",
-        "병원 잘하는 곳 아시나요?",
-        "저희 집 고양이 보시고 가세요",
-        "사기 조심하세요",
-        "배고프다",
-        "괜찮나요",
+        "사기 조심하세요\n여자분이랑 약속 잡고 나갔더니 건장한 남성이었어요 ㅡㅡ",
+        "다이어트 중인데 배고프네요",
+        "첫 데이트로 하남돼지집 괜찮나요?"
     )
+    val image = listOf(
+        R.drawable.cha,
+        R.drawable.winter,
+        R.drawable.cat,
+        R.drawable.card,
+        R.drawable.jjang_gu,
+        R.drawable.door,
+        R.drawable.health,
+        R.drawable.umm,
+        R.drawable.fish
+    )
+
+    val nicknames = listOf(
+        "차은우",
+        "윈터",
+        "냥냥펀치",
+        "카드값줘체리",
+        "짱구는 옷말려",
+        "문희 열립니다",
+        "헬창",
+        "하울의 음~쥑이는 성",
+        "생갈치1호의행방불명"
+    )
+
+    var index = 0
+
+    val post = mutableListOf<PostData>().apply {
+        repeat(9){
+            add(PostData(nicknames[index], image[index], contents[index]))
+            index += 1
+        }
+    }
+
     val colorList = listOf(
         listOf(Color(0xFFF3A19C), Color(0xFFEEBC90)),
         listOf(Color(0xFF8EB0E6), Color(0xFF9FD5C7)),
@@ -196,48 +214,6 @@ private fun ShowBoard(weatherData: WeatherData, navController: NavHostController
                     .padding(20.dp, 0.dp, 20.dp, 0.dp)
             ) {
                 ShowWeather(weatherData)
-                Row(
-                    modifier = Modifier
-                        .padding(0.dp, 0.dp, 0.dp, 15.dp)
-                ) {
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.White,
-                            contentColor = Color.White,
-                            disabledBackgroundColor = Color.Transparent,
-                            disabledContentColor = Color.White
-                        ),
-                        elevation = ButtonDefaults.elevation(0.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "자유",
-                                color = Color.Black,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                    Button(
-                        onClick = { },
-                        colors = ButtonDefaults.buttonColors(
-                            backgroundColor = Color.Transparent,
-                            contentColor = Color.White,
-                            disabledBackgroundColor = Color.DarkGray,
-                            disabledContentColor = Color.White
-                        ),
-                        elevation = ButtonDefaults.elevation(0.dp),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                text = "환경",
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                    }
-                }
                 Text(
                     "자유게시판",
                     color = Color.DarkGray,
@@ -246,39 +222,44 @@ private fun ShowBoard(weatherData: WeatherData, navController: NavHostController
                     modifier = Modifier.padding(bottom = 10.dp)
                 )
                 LazyColumn {
-                    items(contents) { content ->
-                        Divider()
-                        Column(
-                        ) {
-                            Row(
-                                Modifier.padding(top = 5.dp)
-                            ) {
-                                Image(
-                                    painter = painterResource(id = R.drawable.cha),
-                                    contentDescription = "사람 사진",
-                                    Modifier
-                                        .size(50.dp)
-                                        .clip(CircleShape)
-                                )
-                                Text(
-                                    "차은우",
-                                    fontSize = 14.sp,
-                                    modifier = Modifier
-                                        .padding(start = 7.dp, bottom = 3.dp)
-                                        .align(Alignment.CenterVertically)
-                                )
-                            }
-                            Text(
-                                content,
-                                fontSize = 16.sp,
-                                modifier = Modifier
-                                    .padding(top = 13.dp, bottom = 5.dp)
-                                    .clickable { navController.navigate(NavItem.COMMENT.routeName) }
-                            )
-                        }
+                    itemsIndexed(post) { _, post ->
+                        postItemView(post, navController)
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun postItemView(post: PostData, navController: NavHostController) {
+    Divider()
+    Column(
+    ) {
+        Row(
+            Modifier.padding(top = 5.dp)
+        ) {
+            Image(
+                painter = painterResource(id = post.image),
+                contentDescription = "사람 사진",
+                Modifier
+                    .size(50.dp)
+                    .clip(CircleShape)
+            )
+            Text(
+                post.nickname,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(start = 7.dp, bottom = 3.dp)
+                    .align(Alignment.CenterVertically)
+            )
+        }
+        Text(
+            post.content,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .padding(top = 13.dp, bottom = 5.dp)
+                .clickable { navController.navigate(NavItem.COMMENT.routeName) }
+        )
     }
 }

@@ -72,8 +72,21 @@ class MainActivity : ComponentActivity(), LocationListener {
         setContent {
             val navController = rememberNavController()
 
-            Scaffold(bottomBar = { BottomNavigationBar(items = listOf(BottomNavItem.BoardScreen, BottomNavItem.UserScreen, BottomNavItem.ChatListScreen, BottomNavItem.MyPageScreen), navController = navController) }) {
-                Screen(mainViewModel = viewModel, startRoute = BottomNavItem.BoardScreen.route, navController = navController)
+            Scaffold(bottomBar = {
+                BottomNavigationBar(
+                    items = listOf(
+                        BottomNavItem.BoardScreen,
+                        BottomNavItem.UserScreen,
+                        BottomNavItem.ChatListScreen,
+                        BottomNavItem.MyPageScreen
+                    ), navController = navController
+                )
+            }) {
+                Screen(
+                    mainViewModel = viewModel,
+                    startRoute = BottomNavItem.BoardScreen.route,
+                    navController = navController
+                )
             }
         }
     }
@@ -220,11 +233,23 @@ class MainActivity : ComponentActivity(), LocationListener {
 }
 
 @Composable
-fun Screen(mainViewModel: MainViewModel, startRoute: String, navController: NavHostController, modifier: Modifier = Modifier) {
+fun Screen(
+    mainViewModel: MainViewModel,
+    startRoute: String,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     // NavHost 로 네비게이션 결정
     NavHost(navController, startRoute) {
-        composable(BottomNavItem.BoardScreen.route) {
-            Home(viewModel = mainViewModel, navController = navController)
+        composable("${BottomNavItem.BoardScreen.route}/{weatherCode",
+            arguments = listOf(
+                navArgument("weatherCode") { type = NavType.IntType }
+            )) {
+            Home(
+                viewModel = mainViewModel,
+                navController = navController,
+                weatherCode = it.arguments?.getInt("weatherCode") ?: 0
+            )
         }
         composable(
             "${BottomNavItem.MyPageScreen.route}/{userId}",
@@ -240,19 +265,23 @@ fun Screen(mainViewModel: MainViewModel, startRoute: String, navController: NavH
         }
         composable(
             NavItem.POST.routeName
-        ){
+        ) {
             PostScreen(navController = navController)
         }
         composable(
             NavItem.COMMENT.routeName
-        ){
+        ) {
             CommentScreen(navController = navController)
         }
     }
 }
 
 @Composable
-fun BottomNavigationBar(items: List<BottomNavItem>, navController: NavHostController, modifier: Modifier = Modifier) {
+fun BottomNavigationBar(
+    items: List<BottomNavItem>,
+    navController: NavHostController,
+    modifier: Modifier = Modifier
+) {
     val backStackEntry = navController.currentBackStackEntryAsState()
     BottomNavigation(backgroundColor = Color.White, modifier = modifier) {
         items.forEach { item ->

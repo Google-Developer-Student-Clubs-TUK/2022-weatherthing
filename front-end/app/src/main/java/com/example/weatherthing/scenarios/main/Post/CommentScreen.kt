@@ -1,59 +1,70 @@
 package com.example.weatherthing.scenarios.main.Post
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIosNew
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.weatherthing.R
-import com.example.weatherthing.scenarios.main.NavItem
-import com.example.weatherthing.ui.theme.skyblue
+import com.example.weatherthing.data.CommentData
 
 @Composable
 fun CommentScreen(navController: NavHostController) {
     var value by remember { mutableStateOf(TextFieldValue("")) }
-    val contents = listOf(
-        "너무 잘생기셨어요",
-        "무슨 치킨 좋아하세요?",
-        "남자도 되나요?",
-        "저랑 같이 먹어요 :)",
-        "어디 사세요? ㅎㅎ",
-        "저 기프티콘 있는데, 같이 드실래요?",
-        "너무 잘생기셨어요",
-        "무슨 치킨 좋아하세요?",
-        "남자도 되나요?",
-        "저랑 같이 먹어요 :)",
-        "어디 사세요? ㅎㅎ",
-        "저 기프티콘 있는데, 같이 드실래요?",
-        "너무 잘생기셨어요",
-        "무슨 치킨 좋아하세요?",
-        "남자도 되나요?",
-        "저랑 같이 먹어요 :)",
-        "어디 사세요? ㅎㅎ",
-        "저 기프티콘 있는데, 같이 드실래요?"
+
+    val image = listOf(
+        R.drawable.winter,
+        R.drawable.cat,
+        R.drawable.umm,
+        R.drawable.fish,
+        R.drawable.door,
+        R.drawable.health
     )
+
+    val nicknames = listOf(
+        "윈터",
+        "냥냥펀치",
+        "하울의 음~쥑이는 성",
+        "생갈치1호의행방불명",
+        "문희 열립니다",
+        "헬창",
+    )
+
+    val comments = listOf(
+        "무슨 치킨 좋아하세요?",
+        "남자도 되나요?",
+        "저랑 같이 먹어요 :)",
+        "어디 사세요? ㅎㅎ 맛있는 거 사드릴까요?",
+        "저 기프티콘 있는데, 같이 드실래요?",
+        "그렇게 생기면 무슨 기분이에요?"
+    )
+
+    var index = 0
+
+    val comment = mutableListOf<CommentData>().apply {
+        repeat(6){
+            add(CommentData(nicknames[index], image[index], comments[index]))
+            index += 1
+        }
+    }
+
     val colorList = listOf(
         listOf(Color(0xFFF5C1BD), Color(0xFFF0D8C3)),
         listOf(Color(0xFFAEC2E2), Color(0xFFAED6CC)),
@@ -78,7 +89,8 @@ fun CommentScreen(navController: NavHostController) {
                     .fillMaxSize()
             ) {
                 Row(
-                    Modifier.fillMaxWidth()
+                    Modifier
+                        .fillMaxWidth()
                         .height(40.dp)
                         .padding(end = 10.dp, bottom = 5.dp)
                 ) {
@@ -111,39 +123,8 @@ fun CommentScreen(navController: NavHostController) {
                         .align(Alignment.CenterHorizontally),
                 ) {
                     LazyColumn {
-                        items(contents) { content ->
-                            Column(
-                            ) {
-                                Row(
-                                    Modifier.padding(top = 6.dp, bottom = 6.dp)
-                                ) {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.cha),
-                                        contentDescription = "사람 사진",
-                                        Modifier
-                                            .size(40.dp)
-                                            .clip(CircleShape)
-                                    )
-                                    Column(
-                                        Modifier.alignByBaseline()
-                                    ) {
-                                        Text(
-                                            "차은우",
-                                            fontSize = 13.sp,
-                                            modifier = Modifier.padding(start = 7.dp, bottom = 3.dp)
-                                        )
-                                        Text(
-                                            content,
-                                            fontSize = 13.sp,
-                                            modifier = Modifier.padding(
-                                                start = 7.dp,
-                                                top = 3.dp,
-                                                bottom = 5.dp
-                                            )
-                                        )
-                                    }
-                                }
-                            }
+                        itemsIndexed(comment) { _, comment ->
+                            commentView(comment = comment)
                         }
                     }
                 }
@@ -188,6 +169,43 @@ fun CommentScreen(navController: NavHostController) {
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+
+@Composable
+private fun commentView(comment: CommentData) {
+    Column(
+    ) {
+        Row(
+            Modifier.padding(top = 6.dp, bottom = 6.dp)
+        ) {
+            Image(
+                painter = painterResource(id = comment.image),
+                contentDescription = "사람 사진",
+                Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+            )
+            Column(
+                Modifier.alignByBaseline()
+            ) {
+                Text(
+                    comment.nickname,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(start = 7.dp, bottom = 3.dp)
+                )
+                Text(
+                    comment.comment,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(
+                        start = 7.dp,
+                        top = 3.dp,
+                        bottom = 5.dp
+                    )
+                )
             }
         }
     }
